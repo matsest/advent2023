@@ -1,0 +1,34 @@
+version: "3"
+
+tasks:
+  default:
+    desc: Print available tasks
+    cmds:
+      - task --list
+    silent: true
+
+  run:
+    desc: "Run solution for a day with CLI argument. Example: task run -- 01"
+    silent: true
+    cmds:
+      - |
+        echo "day {{.CLI_ARGS}}"
+        cd "{{.CLI_ARGS}}" || echo 'not found' && exit
+        go run main.go
+        cd ..
+        echo
+
+  run-all:
+    desc: Run solutions for all days
+    silent: true
+    cmds:
+      - |
+        for d in */; do
+          if [[ "$d" =~ [0-2][0-9] ]]; then
+            echo "day $d"
+            cd "$d" || echo 'not found' && continue
+            go run main.go
+            cd ..
+            echo
+          fi
+        done
