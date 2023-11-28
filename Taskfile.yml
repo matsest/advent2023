@@ -13,10 +13,23 @@ tasks:
     cmds:
       - |
         echo "day {{.CLI_ARGS}}"
-        cd "{{.CLI_ARGS}}" || echo 'not found' && exit
+        cd "{{.CLI_ARGS}}"
         go run main.go
         cd ..
         echo
+
+  test:
+    desc: "Test solution for a day with CLI argument. Example: task run -- 01"
+    silent: true
+    cmds:
+      - |
+        echo "day {{.CLI_ARGS}}"
+        cd "{{.CLI_ARGS}}"
+        go test -v
+        cd ..
+        echo
+
+
 
   run-all:
     desc: Run solutions for all days
@@ -26,7 +39,7 @@ tasks:
         for d in */; do
           if [[ "$d" =~ [0-2][0-9] ]]; then
             echo "day $d"
-            cd "$d" || echo 'not found' && continue
+            cd "$d"
             go run main.go
             cd ..
             echo
