@@ -29,17 +29,15 @@ tasks:
         cd ..
         echo
 
-
-
   run-all:
     desc: Run solutions for all days
     silent: true
     cmds:
       - |
-        for d in */; do
-          if [[ "$d" =~ [0-2][0-9] ]]; then
-            echo "day $d"
-            cd "$d"
+        for d in $(seq -w 1 24); do
+          if [[ -d "$(pwd)/${d}" ]]; then
+            echo "day ${d}"
+            cd "${d}"
             go run main.go
             cd ..
             echo
