@@ -41,10 +41,10 @@ type Card struct {
 	numbers []int
 }
 
-func (g Card) Points() (sum int){
-	for _, c := range g.numbers {
-		for _, wc := range g.winningNumbers {
-			if c == wc {
+func (c Card) Points() (sum int){
+	for _, n := range c.numbers {
+		for _, wn := range c.winningNumbers {
+			if n == wn {
 				if sum > 0 {
 					sum *= 2
 				}
@@ -57,10 +57,10 @@ func (g Card) Points() (sum int){
 	return sum
 }
 
-func (g Card) NMatchingNumbers() (sum int){
-	for _, c := range g.numbers {
-		for _, wc := range g.winningNumbers {
-			if c == wc {
+func (c Card) NMatchingNumbers() (sum int){
+	for _, n := range c.numbers {
+		for _, wn := range c.winningNumbers {
+			if n == wn {
 					sum += 1
 			}
 		}
@@ -71,22 +71,22 @@ func (g Card) NMatchingNumbers() (sum int){
 func parseInput(lines []string) (cards []Card){
 	for _, line := range lines {
 		//fmt.Println(line)
-		game := Card{}
+		card := Card{}
 		parts := strings.Split(line, ": ")
 
 		// set index
 		indexS := strings.Fields(parts[0])[1]
 		indexN, _ := strconv.Atoi(indexS)
-		game.index = indexN
+		card.index = indexN
 
-		// set winning cards and cards
+		// set winning numbers and numbers
 		numbers := strings.Split(parts[1], " | ")
-		winningCards := strings.Fields(numbers[0])
-		gameCards := strings.Fields(numbers[1])
-		game.winningNumbers, _ = utils.SliceAtoi(winningCards)
-		game.numbers, _ = utils.SliceAtoi(gameCards)
+		winningNumbers := strings.Fields(numbers[0])
+		cardNumbers := strings.Fields(numbers[1])
+		card.winningNumbers, _ = utils.SliceAtoi(winningNumbers)
+		card.numbers, _ = utils.SliceAtoi(cardNumbers)
 
-		cards = append(cards, game)
+		cards = append(cards, card)
 	}
 	return cards
 }
