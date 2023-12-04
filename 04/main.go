@@ -15,8 +15,24 @@ func p1(cards []Card) (sum int) {
 	return sum
 }
 
-func p2(games []Card) int {
-	return 2
+func p2(cards []Card) int {
+	// Find out number of copies
+	copies := make(map[int]int)
+	for _, c := range cards {
+		current := c.index
+		currentCopies := copies[current]
+		nmatchingNumbers := c.NMatchingNumbers()
+		for i := current + 1; i <= current + nmatchingNumbers; i++ {
+			copies[i] += (1 + currentCopies)
+		}
+	}
+
+	// Add initial cards and copies
+	total := len(cards)
+	for i := 1; i <= len(cards); i++{
+		total += copies[i]
+	}
+	return total
 }
 
 type Card struct {
@@ -35,11 +51,20 @@ func (g Card) Points() (sum int){
 				if sum == 0 {
 					sum += 1
 				}
-				//fmt.Println("winning number ", wc, "sum now ", sum)
 			}
 		}
 	}
-	//fmt.Println(g.index, sum)
+	return sum
+}
+
+func (g Card) NMatchingNumbers() (sum int){
+	for _, c := range g.numbers {
+		for _, wc := range g.winningNumbers {
+			if c == wc {
+					sum += 1
+			}
+		}
+	}
 	return sum
 }
 
