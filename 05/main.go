@@ -26,7 +26,6 @@ type Conversions struct {
 }
 
 func parseInput(inputFile string) (seeds []int, c Conversions) {
-
 	file, err := os.Open(inputFile)
 	if err != nil {
 		fmt.Println("Error opening file:", err)
@@ -57,7 +56,6 @@ func parseInput(inputFile string) (seeds []int, c Conversions) {
 			section = "humidityToLocation"
 		default:
 			if line != "" {
-
 				if line[0:5] == "seeds" {
 					numbers, err := utils.SliceAtoi(strings.Fields(line[6:]))
 					//fmt.Println(line[6:], numbers, err)
@@ -105,33 +103,39 @@ func resolve(input int, c []conversionRange) (new int) {
 	return new
 }
 
+func findLocation(seed int, c Conversions) int {
+	var soil, fertilizer, water, light, temperature, humidity, location int
+	//fmt.Println("\nseed ", s)
+
+	soil = resolve(seed, c.seedToSoil)
+	//fmt.Println("soil", soil)
+
+	fertilizer = resolve(soil, c.soilToFertilizer)
+	//fmt.Println("fertilizer", fertilizer)
+
+	water = resolve(fertilizer, c.fertilizerToWater)
+	//fmt.Println("water", water)
+
+	light = resolve(water, c.waterToLight)
+	//fmt.Println("light", light)
+
+	temperature = resolve(light, c.lightToTemperate)
+	//fmt.Println("temperature", temperature)
+
+	humidity = resolve(temperature, c.temperatureToHumidity)
+	//fmt.Println("humidity", humidity)
+
+	location = resolve(humidity, c.humidityToLocation)
+	//fmt.Println("location", location)
+
+	return location
+}
+
 func p1(seeds []int, c Conversions) int {
 	lowest := math.MaxInt
-	var soil, fertilizer, water, light, temperature, humidity, location int
+	var location int
 	for _, s := range seeds {
-		//fmt.Println("\nseed ", s)
-
-		soil = resolve(s, c.seedToSoil)
-		//fmt.Println("soil", soil)
-
-		fertilizer = resolve(soil, c.soilToFertilizer)
-		//fmt.Println("fertilizer", fertilizer)
-
-		water = resolve(fertilizer, c.fertilizerToWater)
-		//fmt.Println("water", water)
-
-		light = resolve(water, c.waterToLight)
-		//fmt.Println("light", light)
-
-		temperature = resolve(light, c.lightToTemperate)
-		//fmt.Println("temperature", temperature)
-
-		humidity = resolve(temperature, c.temperatureToHumidity)
-		//fmt.Println("humidity", humidity)
-
-		location = resolve(humidity, c.humidityToLocation)
-		//fmt.Println("location", location)
-
+		location = findLocation(s, c)
 		if location < lowest {
 			lowest = location
 		}
@@ -158,14 +162,13 @@ func p2seeds(initialSeeds []int) (seeds []seedRange) {
 	return
 }
 
+// kill's CPU :(
 func p2(seeds []seedRange, c Conversions) int {
-
 	lowest := math.MaxInt
 	var location int
 	for _, sr := range seeds {
-
 		for s := sr.start; s <= sr.end; s++ {
-			location = p1([]int{s}, c)
+			location = findLocation(s, c)
 			if location < lowest {
 				lowest = location
 			}
@@ -179,7 +182,7 @@ func main() {
 	seeds, conversions := parseInput("input.txt")
 	fmt.Println(p1(seeds, conversions))
 
-	seeds2 := p2seeds(seeds)
-	//fmt.Println(seeds2)
-	fmt.Println(p2(seeds2, conversions))
+	//seeds2 := p2seeds(seeds)
+	//fmt.Println(p2(seeds2, conversions))
+	fmt.Println("p2 commented out - ineffective")
 }
