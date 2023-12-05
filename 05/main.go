@@ -10,9 +10,6 @@ import (
 	"github.com/matsest/advent2023/utils"
 )
 
-func p2(input string) int {
-	return 2
-}
 type conversionRange struct {
 	dstStart int
 	srcStart int
@@ -142,8 +139,47 @@ func p1(seeds []int, c Conversions) int {
 	return lowest
 }
 
+// Part 2
+type seedRange struct {
+	start  int
+	end    int
+	length int
+}
+
+func p2seeds(initialSeeds []int) (seeds []seedRange) {
+	for i := 0; i < len(initialSeeds); i = i + 2 {
+		//fmt.Println(initialSeeds[i : i+2])
+		start := initialSeeds[i]
+		length := initialSeeds[i+1]
+		end := start + length - 1
+		//fmt.Println("start", start, "end", end, "length", length)
+		seeds = append(seeds, seedRange{start, end, length})
+	}
+	return
+}
+
+func p2(seeds []seedRange, c Conversions) int {
+
+	lowest := math.MaxInt
+	var location int
+	for _, sr := range seeds {
+
+		for s := sr.start; s <= sr.end; s++ {
+			location = p1([]int{s}, c)
+			if location < lowest {
+				lowest = location
+			}
+			//fmt.Println("seed", s, "location", location)
+		}
+	}
+	return lowest
+}
+
 func main() {
 	seeds, conversions := parseInput("input.txt")
 	fmt.Println(p1(seeds, conversions))
-	fmt.Println(p2("2"))
+
+	seeds2 := p2seeds(seeds)
+	//fmt.Println(seeds2)
+	fmt.Println(p2(seeds2, conversions))
 }
