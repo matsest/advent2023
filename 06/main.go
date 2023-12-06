@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"strconv"
 	"strings"
 
 	"github.com/matsest/advent2023/utils"
@@ -17,33 +18,39 @@ func p1(races []Race) (sum int) {
 				rCount += 1
 			}
 		}
-		sum*=rCount
+		sum *= rCount
 	}
 	return sum
 }
 
-func p2(input string) int {
-	return 2
+func p2(r Race) (sum int) {
+	r.CalculateResults()
+	for _, res := range r.results {
+		if res.distance > r.record {
+			sum += 1
+		}
+	}
+	return sum
 }
 
 type Race struct {
-	totalTime    int
-	record  int
-	results []RaceResult
+	totalTime int
+	record    int
+	results   []RaceResult
 }
 
 type RaceResult struct {
-	holdTime int
-	totalTime     int
-	distance int
+	holdTime  int
+	totalTime int
+	distance  int
 }
 
-func (r *Race) CalculateResults(){
+func (r *Race) CalculateResults() {
 	for i := 1; i <= r.totalTime; i++ {
-		holdTime := i //ms
+		holdTime := i                          //ms
 		timeToTravel := r.totalTime - holdTime //ms
-		startSpeed := holdTime //mm/ms
-		distance := startSpeed*timeToTravel
+		startSpeed := holdTime                 //mm/ms
+		distance := startSpeed * timeToTravel  //mm
 		//fmt.Println("holdTime:", i, "distance", distance)
 		r.results = append(r.results, RaceResult{holdTime: holdTime, totalTime: r.totalTime, distance: distance})
 	}
@@ -58,9 +65,16 @@ func parseInput(lines []string) (races []Race) {
 	return races
 }
 
+func parseInput2(lines []string) (race Race) {
+	times, _ := strconv.Atoi(strings.Join(strings.Fields(lines[0])[1:], ""))
+	records, _ := strconv.Atoi(strings.Join(strings.Fields(lines[1])[1:], ""))
+	return Race{times, records, []RaceResult{}}
+}
+
 func main() {
 	puzzle_input, _ := utils.ReadLines("input.txt")
 	races := parseInput(puzzle_input)
 	fmt.Println(p1(races))
-	fmt.Println(p2("2"))
+	races2 := parseInput2(puzzle_input)
+	fmt.Println(p2(races2))
 }
