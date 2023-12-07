@@ -24,8 +24,108 @@ func p1(hands Hands) (sum int) {
 	return sum
 }
 
-func p2(input string) int {
-	return 2
+func p2(hands Hands) (sum int) {
+	// overwrite cardsToValue
+	cardsToValue["J"] = 1
+	for i := range hands {
+		hands[i].getType2()
+		//fmt.Println(hands[i])
+	}
+	//fmt.Println("before sort: ", hands)
+	sort.Sort(hands)
+	types := map[string]int{}
+	for i := range hands {
+		hands[i].rank = i + 1
+		sum += hands[i].rank * hands[i].bidAmount
+		types[hands[i].typeName] += 1
+	}
+	//fmt.Println("after sort: ", hands)
+	return sum
+}
+
+func (h *Hand) getType2() {
+	tempMap := map[string]int{}
+	var typeName string
+
+	var jokerCount int
+	for _, c := range h.cards {
+		if c == "J" {
+			jokerCount += 1
+		} else {
+			tempMap[c] += 1
+		}
+	}
+
+	var pairs int = 0
+	for _, v := range tempMap {
+		if v == 2 {
+			pairs += 1
+		}
+	}
+
+	if len(tempMap) == 4 { // 1J, 4 unique
+		typeName = "onePair"
+	} else if len(tempMap) == 5 { // 5 unique, no J
+		typeName = "highCard"
+	} else if len(tempMap) == 1 || len(tempMap) == 0 { // five of a kind (either 4+1J or 5J)
+		typeName = "fiveOfAKind"
+	} else { // if hell..
+		for _, v := range tempMap {
+			if v == 4 {
+				typeName = "fourOfAKind"
+				break // highest possible
+			} else if v == 3 {
+				typeName = "threeOfAKind"
+				if jokerCount == 1 {
+					typeName = "fourOfAKind"
+				} else if jokerCount == 2 {
+					typeName = "fiveOfAKind"
+				}
+				break // all options
+			} else if v == 1 {
+				typeName = "highCard"
+				if jokerCount == 1 {
+					typeName = "onePair"
+				} else if jokerCount == 2 {
+					typeName = "threeOfAKind"
+					break // highest possible
+				} else if jokerCount == 3 {
+					typeName = "fourOfAKind"
+					break // highest possible
+				}
+			}
+		}
+		if pairs == 2 {
+			typeName = "twoPairs"
+			if jokerCount == 1 {
+				typeName = "fullHouse"
+			}
+		} else if pairs == 1 && typeName == "threeOfAKind" {
+			typeName = "fullHouse"
+			if jokerCount == 2 {
+				typeName = "fourOfAKind"
+			}
+		} else if pairs == 1 {
+			if jokerCount == 1 {
+				typeName = "threeOfAKind"
+			} else if jokerCount == 2 {
+				typeName = "fourOfAKind"
+			} else {
+				typeName = "onePair"
+			}
+		}
+	}
+	h.typeName = typeName
+}
+
+var handTypes map[string]int = map[string]int{
+	"fiveOfAKind":  7,
+	"fourOfAKind":  6,
+	"fullHouse":    5,
+	"threeOfAKind": 4,
+	"twoPairs":     3,
+	"onePair":      2,
+	"highCard":     1,
 }
 
 var cardsToValue map[string]int = map[string]int{
@@ -42,16 +142,6 @@ var cardsToValue map[string]int = map[string]int{
 	"Q": 12,
 	"K": 13,
 	"A": 14,
-}
-
-var handTypes map[string]int = map[string]int{
-	"fiveOfAKind":  7,
-	"fourOfAKind":  6,
-	"fullHouse":    5,
-	"threeOfAKind": 4,
-	"twoPairs":     3,
-	"onePair":      2,
-	"highCard":     1,
 }
 
 type Hand struct {
@@ -72,6 +162,7 @@ func getStrongestHand(h1, h2 Hand) (h Hand) {
 	for i := range h1.cards {
 		if h1.cards[i] == h2.cards[i] {
 			continue
+			// note, next line need to change for P 2
 		} else if cardsToValue[h1.cards[i]] > cardsToValue[h2.cards[i]] {
 			h = h1
 			break
@@ -152,5 +243,5 @@ func main() {
 	hands := parseInput(puzzle_input)
 	//fmt.Println(hands)
 	fmt.Println(p1(hands))
-	fmt.Println(p2("2"))
+	fmt.Println(p2(hands))
 }
