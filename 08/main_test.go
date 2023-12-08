@@ -26,3 +26,23 @@ func Test_p1(t *testing.T) {
 		})
 	}
 }
+
+func Test_p2(t *testing.T) {
+	tests := []struct {
+		name      string
+		fileName string
+		want int
+	}{
+		{"test3", "test3.txt", 6},
+		{"input", "input.txt", 11795205644011},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			puzzle_input, _ := utils.ReadLines(tt.fileName)
+			instructions, nodes := parseInput(puzzle_input)
+			if gotCount := p2(instructions, nodes); gotCount != tt.want {
+				t.Errorf("p2(%v) = %v, want %v", tt.fileName, gotCount, tt.want)
+			}
+		})
+	}
+}
