@@ -85,8 +85,8 @@ func Test_p1(t *testing.T) {
 		wantSum int
 	}{
 		{
-			name: "test",
-			args: args{"test.txt"},
+			name:    "test",
+			args:    args{"test.txt"},
 			wantSum: 114,
 		},
 	}
@@ -96,6 +96,63 @@ func Test_p1(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			if gotSum := p1(dataset); gotSum != tt.wantSum {
 				t.Errorf("p1() = %v, want %v", gotSum, tt.wantSum)
+			}
+		})
+	}
+}
+
+func Test_p2(t *testing.T) {
+	type args struct {
+		fileName string
+	}
+	tests := []struct {
+		name    string
+		args    args
+		wantSum int
+	}{
+		{
+			name:    "test",
+			args:    args{"test.txt"},
+			wantSum: 2,
+		},
+	}
+	for _, tt := range tests {
+
+		puzzle_input, _ := utils.ReadLines(tt.args.fileName)
+		dataset := parseInput(puzzle_input)
+		t.Run(tt.name, func(t *testing.T) {
+			if gotSum := p2(dataset); gotSum != tt.wantSum {
+				t.Errorf("p2() = %v, want %v", gotSum, tt.wantSum)
+			}
+		})
+	}
+}
+
+func Test_reverseSlice(t *testing.T) {
+	type args struct {
+		slice []int
+	}
+	tests := []struct {
+		name string
+		args args
+		want []int
+	}{
+		{
+			name: "test",
+			args: args{[]int{1, 2, 3, 4}},
+			want: []int{4, 3, 2, 1},
+		},
+		{
+			name: "test2",
+			args: args{[]int{1, 4, 1, 4}},
+			want: []int{4, 1, 4, 1},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			reverseSlice(tt.args.slice)
+			if !reflect.DeepEqual(tt.args.slice, tt.want) {
+				t.Errorf("reverseSlice() = %v, want %v", tt.args.slice, tt.want)
 			}
 		})
 	}

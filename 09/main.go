@@ -15,18 +15,30 @@ func p1(dataset [][]int) (sum int) {
 	return sum
 }
 
-func p2(input string) int {
-	return 2
+func p2(dataset [][]int) (sum int) {
+	for _, history:= range dataset {
+		reverseSlice(history)
+		extrapolated := extraPolate(history)
+		sum += extrapolated[len(extrapolated)-1]
+	}
+	return sum
+}
+
+func reverseSlice(slice []int) {
+	for i, j := 0, len(slice)-1; i < j; i, j = i+1, j-1 {
+		// Swap elements at positions i and j
+		slice[i], slice[j] = slice[j], slice[i]
+	}
 }
 
 func extraPolate(history []int) (extrapolated []int){
-	diffs := [][]int{} // need to find out how large
+	diffs := [][]int{}
 	diffs = append(diffs, history)
 	isAllZeros := false
 	//fmt.Println("diffs:", diffs)
 
 	for !isAllZeros {
-		for i := 1; i < len(history); i++ { // need to find how many
+		for i := 1; i < len(history); i++ {
 			tmpdiffs := make([]int, len(history)-i)
 			//fmt.Println(i)
 			for j := 1; j <= len(tmpdiffs); j++ {
@@ -74,5 +86,5 @@ func main() {
 	puzzle_input, _ := utils.ReadLines("input.txt")
 	dataset := parseInput(puzzle_input)
 	fmt.Println(p1(dataset))
-	fmt.Println(p2("2"))
+	fmt.Println(p2(dataset))
 }
