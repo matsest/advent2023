@@ -15,13 +15,14 @@ func p1(galaxyMap map[[2]int]int) int {
 	return distance
 }
 
-func p2(input string) int {
-	return 2
+func p2(galaxyMap map[[2]int]int) int {
+	return p1(galaxyMap)
 }
 
-func parseInput(lines []string) (img Image, galaxyMap map[[2]int]int) {
-	// Go through rows and expand
-	for _, line := range lines {
+func parseInput(lines []string, expansionCoeff int) (img Image, galaxyMap map[[2]int]int) {
+	// Go through rows and index which to expand
+	emptyRowsIndexes := []int{}
+	for y, line := range lines {
 		row := []string{}
 		isEmptyRowCount := 0
 		for _, c := range line {
@@ -29,16 +30,16 @@ func parseInput(lines []string) (img Image, galaxyMap map[[2]int]int) {
 			if string(c) == "." {
 				isEmptyRowCount += 1
 			}
-
 		}
-
+		// check row to expand
 		img = append(img, row)
 		if isEmptyRowCount == len(row) {
-			img = append(img, row)
+			emptyRowsIndexes = append(emptyRowsIndexes, y)
 		}
 	}
 
-	// Go through columns and expand
+	// Go through columns and index which to expand
+	emptyColsIndexes := []int{}
 	for x := 0; x < len(img[0]); x++ {
 		isEmptyColCount := 0
 		for y := 0; y < len(img); y++ {
@@ -46,38 +47,39 @@ func parseInput(lines []string) (img Image, galaxyMap map[[2]int]int) {
 				isEmptyColCount += 1
 			}
 		}
-		// check columns to expand
+		// check column to expand
 		if isEmptyColCount == len(img) {
-			newColumn := "."
-			columnIndex := x + 1
-			expandedImage := make([][]string, len(img))
-
-			// copy in a new column
-			for i, row := range img {
-				expandedRow := make([]string, len(row)+1)            // Increase the row length by 1 for the new column
-				copy(expandedRow[:columnIndex], row[:columnIndex])   // Copy elements before the new column
-				expandedRow[columnIndex] = newColumn                 // Insert the new empty column
-				copy(expandedRow[columnIndex+1:], row[columnIndex:]) // Copy elements after the new column
-				expandedImage[i] = expandedRow                       // Assign the expanded row to the new slice
-			}
-			img = expandedImage
-			x += 1
+			emptyColsIndexes = append(emptyColsIndexes, x)
 		}
 	}
+	//fmt.Println("empty row", emptyRowsIndexes)
+	//fmt.Println("empty cols", emptyColsIndexes)
 
-	// Generate map of all galaxies
+	// Generate map of all galaxies with expansions
 	galaxyMap = make(map[[2]int]int)
 	galaxyIndex := 1
+	multiplier := expansionCoeff
 	for y, row := range img {
+		ydiff := countBelow(emptyRowsIndexes, y)
 		for x, c := range row {
+			xdiff := countBelow(emptyColsIndexes, x)
 			if c == "#" {
-				galaxyMap[[2]int{y,x}] = galaxyIndex
-				galaxyIndex ++
+				galaxyMap[[2]int{y + ydiff*(multiplier-1), x + xdiff*(multiplier-1)}] = galaxyIndex
+				galaxyIndex++
 			}
 		}
 	}
 	//fmt.Println(galaxyMap)
 	return img, galaxyMap
+}
+
+func countBelow(indexes []int, index int) (count int) {
+	for _, i := range indexes {
+		if i < index {
+			count += 1
+		}
+	}
+	return count
 }
 
 func abs(x int) int {
@@ -91,24 +93,20 @@ func manhattanDistance(x1, y1, x2, y2 int) int {
 	return abs(x1-x2) + abs(y1-y2)
 }
 
-func distanceSum(coordinates [][2]int) int {
-	distance := 0
-
+func distanceSum(coordinates [][2]int) (distance int) {
 	for i := 0; i < len(coordinates); i++ {
 		for j := i + 1; j < len(coordinates); j++ {
-			dist := manhattanDistance(coordinates[i][1], coordinates[i][0], coordinates[j][1], coordinates[j][0])
-			distance += dist
+			distance += manhattanDistance(coordinates[i][1], coordinates[i][0], coordinates[j][1], coordinates[j][0])
 		}
 	}
-
 	return distance
 }
 
 type Image [][]string
 
-func (i Image) Print(){
+func (i Image) Print() {
 	for y := range i {
-		for x := range i[y]{
+		for x := range i[y] {
 			fmt.Print(i[y][x], " ")
 		}
 		fmt.Println()
@@ -119,8 +117,11 @@ func (i Image) Print(){
 
 func main() {
 	puzzle_input, _ := utils.ReadLines("input.txt")
-	_, galaxies := parseInput(puzzle_input)
+	_, galaxies := parseInput(puzzle_input, 2)
 	//img.Print()
 	fmt.Println(p1(galaxies))
-	fmt.Println(p2("2"))
+	_, galaxies2 := parseInput(puzzle_input, 1000000)
+	//img.Print()
+	//fmt.Println(galaxies2)
+	fmt.Println(p2(galaxies2))
 }
