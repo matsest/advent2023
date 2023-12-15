@@ -50,8 +50,8 @@ func Test_p1(t *testing.T) {
 		wantSum int
 	}{
 		{
-			name: "test",
-			args: args{"test.txt"},
+			name:    "test",
+			args:    args{"test.txt"},
 			wantSum: 1320,
 		},
 	}
@@ -61,6 +61,32 @@ func Test_p1(t *testing.T) {
 			steps := parseInput(puzzle_input)
 			if gotSum := p1(steps); gotSum != tt.wantSum {
 				t.Errorf("p1() = %v, want %v", gotSum, tt.wantSum)
+			}
+		})
+	}
+}
+
+func Test_p2(t *testing.T) {
+	type args struct {
+		filename string
+	}
+	tests := []struct {
+		name    string
+		args    args
+		wantSum int
+	}{
+		{
+			name:    "test",
+			args:    args{"test.txt"},
+			wantSum: 145,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			puzzle_input, _ := utils.ReadLines("test.txt")
+			steps := parseInput(puzzle_input)
+			if gotSum := p2(steps); gotSum != tt.wantSum {
+				t.Errorf("p2() = %v, want %v", gotSum, tt.wantSum)
 			}
 		})
 	}
